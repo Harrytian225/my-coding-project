@@ -27,7 +27,7 @@ void Game::SetBoard(Board *b) {
 void Game::Start() const {
     std::cout << "Game Start!" << std::endl;
     bool is_black_turn = true;
-    int consecutive_passes = 0; // 连续pass次数
+    int consecutive_passes = 0;
 
     while (bp_->IsInGame()) {
 		board_->Draw();
@@ -54,7 +54,7 @@ void Game::Start() const {
             consecutive_passes++;
             std::cout << "Pass count: " << consecutive_passes << std::endl;
         } else {
-            consecutive_passes = 0; // 重置连续pass计数
+            consecutive_passes = 0; // Reset the consecutive pass count.
         }
 
 		if (consecutive_passes >= 2) {

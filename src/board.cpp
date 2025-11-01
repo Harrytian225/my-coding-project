@@ -56,7 +56,7 @@ bool Board::SetState(int x, int y, int state) {
     if(x < 0 || x >= size_ || y < 0 || y >= size_) return false;
     if (state_[x * size_ + y] != EMPTY) return false;
     
-    // 检查打劫：不能立即在上一手被提子的位置落子
+    // Ko check: A move cannot be played immediately at the position where the opponent's stone was captured in the last move.
     if (x == prevx && y == prevy) return false;
     
     if (!IsValidMove(x, y, state)) return false;
@@ -64,48 +64,46 @@ bool Board::SetState(int x, int y, int state) {
     int tempState = state_[x * size_ + y];
     state_[x * size_ + y] = state;
 
-    // 保存提子前的状态，用于检测提子数量
+    // Saves the state before capture for counting the number of captured stones.
     int *before_capture_state = new int[size_ * size_];
     for (int i = 0; i < size_ * size_; i++) {
         before_capture_state[i] = state_[i];
     }
 
-    // 提掉对方的死子
+    // Remove the opponent's dead stones.
     bool captured = RemoveDeadStones(-state);
 
     if (!HasLiberty(x, y, new bool[size_ * size_])) {
-        state_[x * size_ + y] = tempState; // 回退
+        state_[x * size_ + y] = tempState; // Revert
         delete[] before_capture_state;
         return false;
     }
 
-    // 检查是否形成了打劫（只提了一个子）
+    // Check for ko: whether exactly one stone was captured in the last move.
     if (captured) {
         int capture_count = 0;
         int captured_x = -1, captured_y = -1;
         
-        // 计算提子数量并记录被提子的位置
+        // Calculate the number of captured stones and record their positions.
         for (int i = 0; i < size_ * size_; i++) {
             if (before_capture_state[i] != EMPTY && state_[i] == EMPTY) {
                 capture_count++;
-                if (capture_count == 1) {  // 只记录第一个被提子的位置
+                if (capture_count == 1) {
                     captured_x = i / size_;
                     captured_y = i % size_;
                 }
             }
         }
         
-        // 如果只提了一个子，设置打劫位置
+        // If exactly one stone is captured, set the ko point.
         if (capture_count == 1) {
             prevx = captured_x;
             prevy = captured_y;
         } else {
-            // 提了多个子，不是打劫，重置打劫位置
             prevx = -1;
             prevy = -1;
         }
     } else {
-        // 没有提子，重置打劫位置
         prevx = -1;
         prevy = -1;
     }
@@ -115,16 +113,15 @@ bool Board::SetState(int x, int y, int state) {
 }
 
 bool Board::IsValidMove(int x, int y, int color) {
-    // 移除了原来的打劫检查，因为已经在 SetState 中处理了
     
-    // 临时落子检查自杀规则
+    // Place a temporary move to check the suicide rule.
     int original_state = state_[x * size_ + y];
     state_[x * size_ + y] = color;
     
     bool *visited = new bool[size_ * size_]();
     bool has_liberty = HasLiberty(x, y, visited);
     
-    // 如果自己没有气，检查是否能提对方的子
+    // If your own group has no liberties, check if it can capture opponent stones.
     if (!has_liberty) {
         int dx[] = {0, 1, 0, -1};
         int dy[] = {1, 0, -1, 0};
@@ -148,14 +145,14 @@ bool Board::IsValidMove(int x, int y, int color) {
             }
         }
         
-        // 回退临时落子
+        // Revert the temporary move.
         state_[x * size_ + y] = original_state;
         delete[] visited;
         
         return can_capture;
     }
     
-    // 回退临时落子
+    // Revert the temporary move.
     state_[x * size_ + y] = original_state;
     delete[] visited;
     return true;
@@ -171,7 +168,7 @@ bool Board::HasLiberty(int x, int y, bool visited[], int ignore_color) {
     
     int color = state_[x * size_ + y];
     if (color == EMPTY) {
-        return true; // 空位置就是气
+        return true; // empty means liberty!
     }
     if (ignore_color != -1 && color == ignore_color) {
         return false;
@@ -179,7 +176,7 @@ bool Board::HasLiberty(int x, int y, bool visited[], int ignore_color) {
     
     visited[x * size_ + y] = true;
     
-    // 检查四个方向
+    // check 4 directions
     int dx[] = {0, 1, 0, -1};
     int dy[] = {1, 0, -1, 0};
     
@@ -189,7 +186,7 @@ bool Board::HasLiberty(int x, int y, bool visited[], int ignore_color) {
         
         if (nx >= 0 && nx < size_ && ny >= 0 && ny < size_) {
             if (state_[nx * size_ + ny] == EMPTY) {
-                return true; // 找到气
+                return true; // find liberty
             }
             if (state_[nx * size_ + ny] == color) {
                 if (HasLiberty(nx, ny, visited, ignore_color)) {
@@ -254,7 +251,6 @@ void Board::FindGroup(int x, int y, int color, bool visited[],
     visited[x * size_ + y] = true;
     group.push_back(std::make_pair(x, y));
     
-    // 递归检查四个方向的相邻棋子
     int dx[] = {0, 1, 0, -1};
     int dy[] = {1, 0, -1, 0};
     

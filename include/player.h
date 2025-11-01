@@ -23,7 +23,7 @@ public:
 	void Win();
 	void Lost();
 
-	bool HasPassed() const;  // 新增：检查是否pass
+	bool HasPassed() const; 
     void ResetPass();
 
 	void Play(Board *board);

@@ -29,8 +29,8 @@ public:
 	void Draw() const;
 
 private:
-	void Init();
-	//此处把SetState写在private里是避免恶意攻击（因为游戏设定是黑一步白一步，所以state可以由系统控制）
+    void Init();
+	//Here, placing SetState in private is to prevent malicious attacks (since the game rules dictate that black and white take turns, the state can be controlled by the system).
 	bool SetState(int x, int y, int state);
 	bool IsValidMove(int x, int y, int color);
     bool RemoveDeadStones(int color);
@@ -41,8 +41,8 @@ private:
 
 	int size_;
 	int *state_;
-	int prevx, prevy;//上一次落子位置，用于判断是否存在打劫
-	bool last_move_pass_; // 记录上一次是否pass
+	int prevx, prevy;//The last move's position is used to determine if a ko situation exists.
+	bool last_move_pass_; // Records whether the last move was a pass.
 };
 
 }
