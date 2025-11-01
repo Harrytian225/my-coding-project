@@ -8,6 +8,7 @@ A command-line Go (Weiqi) game implemented in C++, supporting two-player gamepla
 - **Pass functionality** - Players can choose to skip their turn
 - **Resign functionality** - Players can resign to end the game
 - **Ko rule enforcement** - Complete ko detection and infinite loop prevention
+- **Compilation Note:** The source code utilizes C++11 features including `auto` type deduction. Please ensure your compiler supports C++11 or later standards.
 
 ## 🚀 Quick Start
 
