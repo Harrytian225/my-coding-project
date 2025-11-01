@@ -17,4 +17,4 @@ A command-line Go (Weiqi) game implemented in C++, supporting two-player gamepla
 g++ -std=c++11 -o go_game *.cpp
 
 # Run the game
-./go_game
+./go1
